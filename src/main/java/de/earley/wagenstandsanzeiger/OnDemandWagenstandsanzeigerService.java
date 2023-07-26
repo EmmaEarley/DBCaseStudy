@@ -10,8 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+//Service class that provides implementation on how to load the data and find the desired station
+//Loads only the neccessary xml file
 @Service
 @Qualifier("OnDemand")
 public class OnDemandWagenstandsanzeigerService implements WagenstandsanzeigerService {
@@ -19,6 +22,7 @@ public class OnDemandWagenstandsanzeigerService implements WagenstandsanzeigerSe
     @Autowired
     FindSectionService sectionService;
 
+    //return a list of the sections
     @Override
     public List<String> findSections(String ril100, String trainNumber, String waggonNumber) {
         Station station = null;
@@ -28,7 +32,7 @@ public class OnDemandWagenstandsanzeigerService implements WagenstandsanzeigerSe
     }
 
     //return the desired Station element (from the correct xml file)
-    private Station findStation(String ril100) throws Exception {
+    private Station findStation(String ril100) throws IOException {
         //create XML mapper which ignores unknown properties
         XmlMapper xmlMapper = new XmlMapper();
         xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -40,7 +44,7 @@ public class OnDemandWagenstandsanzeigerService implements WagenstandsanzeigerSe
                 return xmlMapper.readValue(file, Station.class);
             }
         }
-        //throw exception if the ril100 doesn't exist
+        //throw exception if no file with the given ril100 was found
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Unbekannte ril100.");
     }
 

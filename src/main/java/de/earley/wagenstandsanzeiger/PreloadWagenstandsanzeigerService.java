@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.http.RequestEntity.put;
-
+//Service class that provides implementation on how to load the data and find the desired station
+//Preloads all xml files
 @Service
 @Qualifier("Preload")
 public class PreloadWagenstandsanzeigerService implements WagenstandsanzeigerService {
@@ -34,24 +34,21 @@ public class PreloadWagenstandsanzeigerService implements WagenstandsanzeigerSer
                 "classpath:/Wagenreihungsplan_RawData_201712112/*.xml");
     }
 
-    /*void load() reads all files in the resources/Wagenreihungsplan_RawData_201712112 folder and
-     transforms them into a List of Stations
-    */
+    //void load() reads all files in the resources/Wagenreihungsplan_RawData_201712112 folder and
+    //transforms them into a List of Stations
     @PostConstruct
     public void load() throws IOException {
         //load the resources
         Resource[] resources = loadWagenreihungsplanData();
-        //open the folder containing the xml files
-        //File folder = new File("src/main/resources/Wagenreihungsplan_RawData_201712112");
-        //save files in a list
-        //File[] fileList = folder.listFiles();
         //create XML mapper which ignores unknown properties
         XmlMapper xmlMapper = new XmlMapper();
         xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         //create a Map and fill it with the station from each file with its shortcode as key
         Map<String, Station> stationMap = new HashMap<>();
         for (Resource resource : resources) {
+            //print each filename as a progress update
             System.out.println(resource.getFilename());
+            //read out a Station from the xml file
             Station station = xmlMapper.readValue(resource.getInputStream(), Station.class);
             stationMap.put(station.shortcode(), station);
         }
@@ -59,6 +56,7 @@ public class PreloadWagenstandsanzeigerService implements WagenstandsanzeigerSer
         this.stations = stationMap;
     }
 
+    //returns a list of the sections
     @Override
     public List<String> findSections(String ril100, String trainNumber, String waggonNumber) {
         Station station = findStation(ril100);
