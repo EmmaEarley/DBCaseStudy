@@ -11,7 +11,8 @@ import java.util.List;
 @RestController
 public class WagenstandsanzeigerController {
     @Autowired
-    @Qualifier("OnDemand")
+    //defines which WagenstandsanzeigerServie to use ("Preload" or "OnDemand")
+    @Qualifier("Preload")
     WagenstandsanzeigerService service;
 
     /**
